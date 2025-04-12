@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Word Guessing Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #f2f2f2;
+    }
+    h1 {
+      color: #4CAF50;
+    }
+    #wordDisplay {
+      font-size: 2em;
+      letter-spacing: 5px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      font-size: 1.5em;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 200px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 1.2em;
+      color: #d32f2f;
+    }
+    #hint {
+      margin-top: 10px;
+      font-size: 1.1em;
+      color: #1976d2;
+    }
+    #guessCounter {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+    #playAgainButton {
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Word Guessing Game</h1>
+  <p>Guess the 5-letter word in 6 tries or less!</p>
+
+  <div id="wordDisplay">_ _ _ _ _</div>
+
+  <input type="text" id="userInput" maxlength="5" placeholder="Enter a word" />
+  <button onclick="checkGuess()">Guess</button>
+
+  <div id="message"></div>
+  <div id="hint"></div>
+  <div id="guessCounter"></div>
+
+  <button id="playAgainButton" onclick="resetGame()">Play Again</button>
+
+  <script>
+    // Word-hint pairs
+    const wordHints = {
+      apple: "It's a fruit that's often red or green.",
+      beach: "A sunny place with sand and waves.",
+      house: "You live in it.",
+      earth: "The planet we all live on.",
+      plant: "It grows in soil and needs water and sunlight.",
+      grape: "Small round fruit, sometimes used to make wine.",
+      music: "You listen to it with your ears.",
+      train: "A vehicle that runs on tracks.",
+      water: "You drink it and it covers most of Earth."
+    };
+
+    let words = Object.keys(wordHints);
+    let randomWord = "";
+    let currentHint = "";
+    let guesses = 0;
+    const maxGuesses = 6;
+
+    function startNewGame() {
+      randomWord = words[Math.floor(Math.random() * words.length)];
+      currentHint = wordHints[randomWord];
+      guesses = 0;
+      document.getElementById("wordDisplay").textContent = "_ _ _ _ _";
+      document.getElementById("userInput").value = "";
+      document.getElementById("userInput").disabled = false;
+      document.querySelector("button[onclick='checkGuess()']").disabled = false;
+      document.getElementById("playAgainButton").style.display = "none";
+      document.getElementById("message").textContent = "";
+      document.getElementById("hint").textContent = "";
+      document.getElementById("guessCounter").textContent = `Guesses remaining: ${maxGuesses}`;
+    }
+
+    function checkGuess() {
+      const userInput = document.getElementById("userInput").value.toLowerCase();
+      const message = document.getElementById("message");
+      const hint = document.getElementById("hint");
+      const guessCounter = document.getElementById("guessCounter");
+
+      if (userInput.length !== 5) {
+        message.textContent = "Please enter a 5-letter word!";
+        return;
+      }
+
+      guesses++;
+
+      // Create feedback for word display
+      let feedback = "";
+      let correctLetters = 0;
+
+      for (let i = 0; i < randomWord.length; i++) {
+        if (userInput[i] === randomWord[i]) {
+          feedback += userInput[i] + " ";
+          correctLetters++;
+        } else {
+          feedback += "_ ";
+        }
+      }
+
+      document.getElementById("wordDisplay").textContent = feedback.trim();
+
+      if (userInput === randomWord) {
+        message.textContent = `🎉 You guessed the word "${randomWord}"!`;
+        endGame();
+      } else if (guesses >= maxGuesses) {
+        message.textContent = `❌ You're out of guesses. The word was "${randomWord}".`;
+        endGame();
+      } else {
+        message.textContent = `${correctLetters} letters are correct.`;
+        if (guesses === 3) {
+          hint.textContent = `Hint: ${currentHint}`;
+        }
+        guessCounter.textContent = `Guesses remaining: ${maxGuesses - guesses}`;
+      }
+    }
+
+    function endGame() {
+      document.getElementById("userInput").disabled = true;
+      document.querySelector("button[onclick='checkGuess()']").disabled = true;
+      document.getElementById("playAgainButton").style.display = "inline-block";
+    }
+
+    function resetGame() {
+      startNewGame();
+    }
+
+    // Initialize game on page load
+    startNewGame();
+  </script>
+
+</body>
+</html>
